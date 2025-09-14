@@ -7,11 +7,7 @@ st.set_page_config(page_title="Amex Data Quality Dashboard", layout="wide")
 st.title("📊 Amex Data Quality & Governance Dashboard")
 st.markdown("### Analyze, Profile, and Remediate Data Quality Issues")
 
-# Upload CSV file
-uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    st.subheader("📌 Uploaded Dataset")
+    df = pd.read_csv("data/transactions.csv")   # put your file inside /data/
     st.dataframe(df.head())
 
     dq = DataQuality(df)
@@ -40,4 +36,5 @@ if uploaded_file:
         st.dataframe(invalid_dates)
 else:
     st.info("📥 Please upload a CSV file to begin analysis.")
+
 
