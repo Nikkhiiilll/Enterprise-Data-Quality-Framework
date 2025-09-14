@@ -2,30 +2,70 @@ import pandas as pd
 import numpy as np
 
 class DataQuality:
-    def __init__(self, df):
+    def __init__(self, df: pd.DataFrame):
         self.df = df
 
-    def check_missing_values(self):
-        missing = self.df.isnull().sum()
-        return missing[missing > 0]
-
-    def check_duplicates(self):
-        duplicates = self.df[self.df.duplicated()]
-        return duplicates
-
-    def check_negative_amounts(self):
-        negatives = self.df[self.df['amount'] < 0]
-        return negatives
-
-    def check_invalid_dates(self):
-        invalid_dates = self.df[~pd.to_datetime(self.df['date'], errors='coerce').notna()]
-        return invalid_dates
-
+    # 1️⃣ Summary Report
     def generate_report(self):
-        report = {
-            "missing_values": self.check_missing_values().to_dict(),
-            "duplicate_records": len(self.check_duplicates()),
-            "negative_amounts": len(self.check_negative_amounts()),
-            "invalid_dates": len(self.check_invalid_dates())
+        return {
+            "rows": len(self.df),
+            "columns": len(self.df.columns),
+            "dtypes": self.df.dtypes.astype(str).to_dict(),
+            "missing_values": self.df.isnull().sum().to_dict(),
+            "duplicate_count": self.df.duplicated().sum(),
+            "memory_usage_mb": round(self.df.memory_usage(deep=True).sum() / (1024**2), 2),
         }
-        return report
+
+    # 2️⃣ Missing Values
+    def check_missing_values(self):
+        return self.df[self.df.isnull().any(axis=1)]
+
+    # 3️⃣ Duplicates
+    def check_duplicates(self):
+        return self.df[self.df.duplicated()]
+
+    # 4️⃣ Negative Amounts
+    def check_negative_amounts(self, column="Amount"):
+        if column in self.df.columns and pd.api.types.is_numeric_dtype(self.df[column]):
+            return self.df[self.df[column] < 0]
+        return pd.DataFrame()
+
+    # 5️⃣ Invalid Dates
+    def check_invalid_dates(self, column="Date"):
+        if column in self.df.columns:
+            invalid_mask = pd.to_datetime(self.df[column], errors="coerce").isna()
+            return self.df[invalid_mask]
+        return pd.DataFrame()
+
+    # 6️⃣ Outliers (Z-Score)
+    def check_outliers(self, column, threshold=3):
+        if column in self.df.columns and pd.api.types.is_numeric_dtype(self.df[column]):
+            z_scores = (self.df[column] - self.df[column].mean()) / self.df[column].std()
+            return self.df[np.abs(z_scores) > threshold]
+        return pd.DataFrame()
+
+    # 7️⃣ Schema Validation
+    def validate_schema(self, expected_schema: dict):
+        """
+        expected_schema = {
+            "CustomerID": "int64",
+            "Amount": "float64",
+            "Date": "datetime64[ns]"
+        }
+        """
+        schema_report = {}
+        for col, dtype in expected_schema.items():
+            if col not in self.df.columns:
+                schema_report[col] = "❌ Missing Column"
+            elif str(self.df[col].dtype) != dtype:
+                schema_report[col] = f"⚠ Type Mismatch (Expected {dtype}, Found {self.df[col].dtype})"
+            else:
+                schema_report[col] = "✅ OK"
+        return schema_report
+
+    # 8️⃣ Correlation Matrix (for EDA)
+    def correlation_matrix(self):
+        numeric_df = self.df.select_dtypes(include=[np.number])
+        if not numeric_df.empty:
+            return numeric_df.corr()
+        return pd.DataFrame()
