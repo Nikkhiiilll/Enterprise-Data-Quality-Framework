@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from src.data_quality import DataQuality
+from data_quality import DataQuality
 
 st.set_page_config(page_title="Amex Data Quality Dashboard", layout="wide")
 
@@ -40,3 +40,4 @@ if uploaded_file:
         st.dataframe(invalid_dates)
 else:
     st.info("📥 Please upload a CSV file to begin analysis.")
+
