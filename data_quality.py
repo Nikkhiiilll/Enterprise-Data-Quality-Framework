@@ -24,27 +24,27 @@ class DataQuality:
     def check_duplicates(self):
         return self.df[self.df.duplicated()]
 
-    # 4️⃣ Negative Amounts
+    # Negative Amounts
     def check_negative_amounts(self, column="Amount"):
         if column in self.df.columns and pd.api.types.is_numeric_dtype(self.df[column]):
             return self.df[self.df[column] < 0]
         return pd.DataFrame()
 
-    # 5️⃣ Invalid Dates
+    # Invalid Dates
     def check_invalid_dates(self, column="Date"):
         if column in self.df.columns:
             invalid_mask = pd.to_datetime(self.df[column], errors="coerce").isna()
             return self.df[invalid_mask]
         return pd.DataFrame()
 
-    # 6️⃣ Outliers (Z-Score)
+    # Outliers (Z-Score)
     def check_outliers(self, column, threshold=3):
         if column in self.df.columns and pd.api.types.is_numeric_dtype(self.df[column]):
             z_scores = (self.df[column] - self.df[column].mean()) / self.df[column].std()
             return self.df[np.abs(z_scores) > threshold]
         return pd.DataFrame()
 
-    # 7️⃣ Schema Validation
+    # Schema Validation
     def validate_schema(self, expected_schema: dict):
         """
         expected_schema = {
@@ -63,10 +63,11 @@ class DataQuality:
                 schema_report[col] = "✅ OK"
         return schema_report
 
-    # 8️⃣ Correlation Matrix (for EDA)
+    # Correlation Matrix (for EDA)
     def correlation_matrix(self):
         numeric_df = self.df.select_dtypes(include=[np.number])
         if not numeric_df.empty:
             return numeric_df.corr()
         return pd.DataFrame()
+
 
