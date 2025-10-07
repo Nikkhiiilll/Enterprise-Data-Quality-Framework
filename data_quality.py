@@ -5,7 +5,7 @@ class DataQuality:
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
-    # 1️⃣ Summary Report
+    # Summary Report
     def generate_report(self):
         return {
             "rows": len(self.df),
@@ -16,11 +16,11 @@ class DataQuality:
             "memory_usage_mb": round(self.df.memory_usage(deep=True).sum() / (1024**2), 2),
         }
 
-    # 2️⃣ Missing Values
+    # Missing Values
     def check_missing_values(self):
         return self.df[self.df.isnull().any(axis=1)]
 
-    # 3️⃣ Duplicates
+    # Duplicates
     def check_duplicates(self):
         return self.df[self.df.duplicated()]
 
@@ -69,3 +69,4 @@ class DataQuality:
         if not numeric_df.empty:
             return numeric_df.corr()
         return pd.DataFrame()
+
