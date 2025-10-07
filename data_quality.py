@@ -5,7 +5,7 @@ class DataQuality:
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
-    # Summary Report
+    # 1.Summary Report
     def generate_report(self):
         return {
             "rows": len(self.df),
@@ -69,5 +69,6 @@ class DataQuality:
         if not numeric_df.empty:
             return numeric_df.corr()
         return pd.DataFrame()
+
 
 
