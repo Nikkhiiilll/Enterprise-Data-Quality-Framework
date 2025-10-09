@@ -20,7 +20,7 @@ class DataQuality:
     def check_missing_values(self):
         return self.df[self.df.isnull().any(axis=1)]
 
-    # Duplicates
+    #Duplicates
     def check_duplicates(self):
         return self.df[self.df.duplicated()]
 
@@ -30,7 +30,7 @@ class DataQuality:
             return self.df[self.df[column] < 0]
         return pd.DataFrame()
 
-    # Invalid Dates
+    #Invalid Dates
     def check_invalid_dates(self, column="Date"):
         if column in self.df.columns:
             invalid_mask = pd.to_datetime(self.df[column], errors="coerce").isna()
@@ -69,6 +69,7 @@ class DataQuality:
         if not numeric_df.empty:
             return numeric_df.corr()
         return pd.DataFrame()
+
 
 
 
